@@ -20,7 +20,9 @@ apiRouter.get('/notes', async (req, res) => {
 });
 
 // This router is responsible for posting, requiring a title and text before posting
-// 
+// If missing a title and text, an error will result, though this should not be allowed to happen as a save doesn't appear until after the parameters are filled
+// newNote added so new notes can be applied to application with a unique id
+// newNote is pushed and written to app, and a catch is placed for potential errors
 apiRouter.post('/notes', async (req, res) => {
     try {
         const { title, text } = req.body;
@@ -47,6 +49,7 @@ apiRouter.post('/notes', async (req, res) => {
     }
 });
 
+// Finally, the delete router finds the id of a note and removed the note when the trash icon is clicked
 apiRouter.delete('/notes/:id', (req, res) => {
     try {
         const { id } = req.params;
@@ -71,5 +74,5 @@ apiRouter.delete('/notes/:id', (req, res) => {
 });
 
 
-
+// apiRouter code is exported
 module.exports = apiRouter;
