@@ -1,26 +1,62 @@
-const notes = require('express').Router();
-const {readAndAppend} = require('../Develop/public/assets/helpers/fsUtils');
-const uuid = require('../Develop/public/assets/helpers/uuid');
+const Router = require('express').Router;
+const fs = require('fs');
+const { readFromFile, readAndRouterend, writeToFile } = require('../public/assets/helpers/fsUtils');
+const uuid = require('../public/assets/helpers/uuid');
 
-notes.get('/', (req, res) => 
-    readFromFile('./Develop/db/db.json').then((data) => res.json(JSON.parse(data)))
+// GET route for retrieving notes
+Router.get('/notes', (req, res) =>
+    readFromFile('../db/db.json').then((data) => res.json(JSON.parse(data)))
 );
 
-notes.post('/', (req, res) => {
-    const {title, text} = req.body;
+Router.post('/notes', (res, req) => {
+    const { title, text } = req.body;
 
-    if (req.body) {
+    if (title && text) {
         const newNote = {
-            title,
-            text,
-            tip_id: uuid(),
+            title: req.body.title,
+            text: req.body.text,
+            note_id: uuid(),
         };
 
-    readAndAppend(newNote, './Develop/db/db.json');
-    res.json(`Note added`);
+        writeToFile(newNote, '../db/db.json');
+
+        const response = {
+            status: 'success',
+            body: newNote,
+        };
+
+        res.json(response);
     } else {
-        res.errored(`Error`);
+        res.json('Error posting your note');
     }
 });
 
-module.export = notes;
+Router.delete('/notes/:id', (req, res) => {
+    const deleteNoteId = req.params.id;
+
+    readFromFile('../db/db.json')
+        .then((data) => {
+            const notes = JSON.parse(data);
+
+            const updatedNotes = notes.filter((note) => note.note_id !== deleteNoteId);
+
+            writeToFile(updatedNotes, '../db/db.json')
+                .then(() => {
+                    const response = {
+                        status: 'success',
+                        message: `Note with id ${deleteNoteId} has been deleted`,
+                    };
+                    res.json(response);
+                })
+                .catch((err) => {
+                    console.error(err);
+                    res.status(500).json('Internal Server Error');
+                });
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).json('Internal Server Error');
+        });
+});
+
+module.export = Router;
