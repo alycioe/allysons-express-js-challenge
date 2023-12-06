@@ -1,19 +1,17 @@
 const express = require('express');
 const path = require('path');
-const api = require('./notes');
+const apiRoutes = require('./notes');
 
-const app = express();
+const router = express.Router();
 
-// retrieves the /notes address and puts the notes.html code in
-app.get('/notes', (req, res) =>
-    res.sendFile(path.join(__dirname, '/public/notes.html'))
+router.get('/notes', (req, res) =>
+    res.sendFile(path.join(__dirname, '../public/notes.html'))
 );
 
-// retrieves the route for the index.html that applies to all pages except notes
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '/public/index.html'))
+router.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/index.html'))
 });
 
-app.use('/api', api);
+router.use('/api', apiRoutes);
 
-module.exports = app;
+module.exports = router;

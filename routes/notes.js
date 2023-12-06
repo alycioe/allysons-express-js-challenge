@@ -1,14 +1,16 @@
-const Router = require('express').Router;
+const express = require('express');
 const fs = require('fs');
 const { readFromFile, readAndRouterend, writeToFile } = require('../public/assets/helpers/fsUtils');
 const uuid = require('../public/assets/helpers/uuid');
 
+const router = express.Router();
+
 // GET route for retrieving notes
-Router.get('/notes', (req, res) =>
+router.get('/notes', (req, res) =>
     readFromFile('../db/db.json').then((data) => res.json(JSON.parse(data)))
 );
 
-Router.post('/notes', (res, req) => {
+router.post('/notes', (req, res) => {
     const { title, text } = req.body;
 
     if (title && text) {
@@ -31,7 +33,7 @@ Router.post('/notes', (res, req) => {
     }
 });
 
-Router.delete('/notes/:id', (req, res) => {
+router.delete('/notes/:id', (req, res) => {
     const deleteNoteId = req.params.id;
 
     readFromFile('../db/db.json')
@@ -59,4 +61,4 @@ Router.delete('/notes/:id', (req, res) => {
         });
 });
 
-module.export = Router;
+module.exports = router;
